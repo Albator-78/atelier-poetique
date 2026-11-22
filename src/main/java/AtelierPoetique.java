@@ -60,17 +60,17 @@ public class AtelierPoetique {
         document.getElementById("analyse").setInnerHTML(analyseHtml.toString());
     }
 
-    public static String[] genererHaiku() {
-        Random rand = new Random();
-        String v1 = VERS_5_SYLLABES.get(rand.nextInt(VERS_5_SYLLABES.size()));
-        String v2 = VERS_7_SYLLABES.get(rand.nextInt(VERS_7_SYLLABES.size()));
+        public static String[] genererHaiku() {
+        String v1 = VERS_5_SYLLABES.get((int) (Math.random() * VERS_5_SYLLABES.size()));
+        String v2 = VERS_7_SYLLABES.get((int) (Math.random() * VERS_7_SYLLABES.size()));
         String v3;
         do {
-            v3 = VERS_5_SYLLABES.get(rand.nextInt(VERS_5_SYLLABES.size()));
+            v3 = VERS_5_SYLLABES.get((int) (Math.random() * VERS_5_SYLLABES.size()));
         } while (v3.equals(v1));
 
         return new String[]{v1, v2, v3};
     }
+
 
     public static int compterSyllabes(String vers) {
         String texte = vers.toLowerCase().trim();
