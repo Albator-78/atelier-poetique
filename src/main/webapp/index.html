@@ -41,6 +41,7 @@
       font-size: 1rem;
       cursor: pointer;
     }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
     .analyse {
       margin-top: 1.5rem;
       padding-top: 1rem;
@@ -49,7 +50,6 @@
       font-size: 0.9rem;
     }
   </style>
-  <script src="classes.wasm-runtime.js"></script>
 </head>
 <body>
 
@@ -103,12 +103,40 @@
   }
 
   window.addEventListener("load", async () => {
-    const teavm = await TeaVM.wasm.load("classes.wasm");
-    wasmExports = teavm.exports;
-    const btn = document.getElementById("btn-generer");
-    btn.disabled = false;
-    btn.addEventListener("click", rafraichirAffichage);
-    rafraichirAffichage();
+    try {
+      // Fournit les fonctions système attendues par le binaire TeaVM Wasm
+      const importObject = {
+        teavm: {
+          currentTimeMillis: () => Date.now(),
+          nanoTime: () => performance.now() * 1000000,
+          putwchar: (c) => {},
+          logString: (s) => {},
+          logInt: (i) => {},
+          logOutOfMemory: () => console.error("Wasm OutOfMemory")
+        },
+        teavmMath: Math
+      };
+
+      const response = await fetch("classes.wasm");
+      if (!response.ok) {
+        throw new Error(`Fichier classes.wasm introuvable (HTTP ${response.status})`);
+      }
+      const bytes = await response.arrayBuffer();
+      const { instance } = await WebAssembly.instantiate(bytes, importObject);
+
+      wasmExports = instance.exports;
+      if (wasmExports.main) {
+        wasmExports.main();
+      }
+
+      const btn = document.getElementById("btn-generer");
+      btn.disabled = false;
+      btn.addEventListener("click", rafraichirAffichage);
+      rafraichirAffichage();
+    } catch (err) {
+      document.getElementById("poeme").textContent = "Erreur Wasm : " + err.message;
+      console.error(err);
+    }
   });
 </script>
 
