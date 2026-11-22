@@ -21,6 +21,15 @@ public class AtelierPoetique {
 
     private static final String VOYELLES = "aeiouyàâäéèêëîïôöùûüÿ";
 
+    // Générateur pseudo-aléatoire autonome (sans java.util.Random)
+    private static long graine = System.currentTimeMillis();
+
+    private static int aleatoire(int max) {
+        graine = (graine * 6364136223846793005L + 1442695040888963407L);
+        int valeur = (int) (graine >>> 33);
+        return (valeur < 0 ? -valeur : valeur) % max;
+    }
+
     public static void main(String[] args) {
         HTMLDocument document = HTMLDocument.current();
         HTMLElement bouton = document.getElementById("btn-generer");
@@ -54,11 +63,11 @@ public class AtelierPoetique {
     }
 
     public static String[] genererHaiku() {
-        String v1 = VERS_5_SYLLABES[(int) (Math.random() * VERS_5_SYLLABES.length)];
-        String v2 = VERS_7_SYLLABES[(int) (Math.random() * VERS_7_SYLLABES.length)];
+        String v1 = VERS_5_SYLLABES[aleatoire(VERS_5_SYLLABES.length)];
+        String v2 = VERS_7_SYLLABES[aleatoire(VERS_7_SYLLABES.length)];
         String v3;
         do {
-            v3 = VERS_5_SYLLABES[(int) (Math.random() * VERS_5_SYLLABES.length)];
+            v3 = VERS_5_SYLLABES[aleatoire(VERS_5_SYLLABES.length)];
         } while (v3.equals(v1));
 
         return new String[]{v1, v2, v3};
