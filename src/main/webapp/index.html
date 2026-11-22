@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atelier Poétique (Java WebAssembly)</title>
+  <title>Tarot Poétique — Triade en Haïku (Java Wasm)</title>
   <style>
     body {
       font-family: "Georgia", serif;
@@ -12,78 +12,229 @@
       display: flex;
       justify-content: center;
       padding: 2rem 1rem;
+      margin: 0;
     }
     .container {
-      max-width: 600px;
+      max-width: 640px;
       width: 100%;
       background: #fff;
-      padding: 2.5rem;
+      padding: 2.25rem;
       border-radius: 8px;
       border: 1px solid #e6e0d8;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     }
-    h1 { color: #8c4a32; text-align: center; font-size: 1.5rem; }
+    h1 {
+      color: #8c4a32;
+      text-align: center;
+      font-size: 1.45rem;
+      margin-top: 0;
+    }
+    .triade {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+      font-family: system-ui, sans-serif;
+    }
+    .lame-card {
+      background: #faf8f5;
+      border: 1px solid #e6e0d8;
+      border-radius: 6px;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+    }
+    .lame-pos {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #7a746e;
+      margin-bottom: 0.35rem;
+    }
+    .lame-nom {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #2c2a29;
+    }
     .poeme-box {
       background: #faf8f5;
       border-left: 3px solid #8c4a32;
       padding: 1.5rem;
       margin: 1.5rem 0;
       font-size: 1.25rem;
-      line-height: 1.8;
+      line-height: 1.85;
       font-style: italic;
     }
     button {
       width: 100%;
-      padding: 0.85rem;
+      padding: 0.9rem;
       background: #8c4a32;
       color: #fff;
       border: none;
       border-radius: 5px;
       font-size: 1rem;
+      font-family: system-ui, sans-serif;
       cursor: pointer;
     }
+    button:hover:not(:disabled) { opacity: 0.92; }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
     .analyse {
       margin-top: 1.5rem;
       padding-top: 1rem;
       border-top: 1px solid #e6e0d8;
       font-family: system-ui, sans-serif;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
+      color: #55504c;
     }
+    .analyse ul {
+      padding-left: 1.2rem;
+      margin: 0.5rem 0 0.75rem 0;
+    }
+    .analyse li { margin-bottom: 0.35rem; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Atelier Poétique (Java Wasm)</h1>
+  <h1>Tarot Poétique — Triade en Haïku</h1>
+
+  <div class="triade" id="triade"></div>
+
   <div class="poeme-box" id="poeme">Chargement du module WebAssembly...</div>
-  <button id="btn-generer" disabled>Composer un nouveau haïku</button>
+
+  <button id="btn-generer" disabled>Tirer une nouvelle triade</button>
+
   <div class="analyse" id="analyse"></div>
 </div>
 
 <script>
-  const VERS_5 = [
-    "Le vent d'automne",
-    "Sous la lune claire",
-    "Une feuille tombe",
-    "L'eau calme du lac",
-    "Dans le silence"
+  const ARCANES = [
+    "0 · Le Mat",
+    "I · Le Bateleur",
+    "II · La Papesse",
+    "III · L'Impératrice",
+    "IV · L'Empereur",
+    "V · Le Pape",
+    "VI · L'Amoureux",
+    "VII · Le Chariot",
+    "VIII · La Justice",
+    "IX · L'Hermite",
+    "X · La Roue de Fortune",
+    "XI · La Force",
+    "XII · Le Pendu",
+    "XIII · L'Arcane sans nom",
+    "XIV · Tempérance",
+    "XV · Le Diable",
+    "XVI · La Maison Dieu",
+    "XVII · L'Étoile",
+    "XVIII · La Lune",
+    "XIX · Le Soleil",
+    "XX · Le Jugement",
+    "XXI · Le Monde"
   ];
-  const VERS_7 = [
-    "Murmure à travers les bois",
-    "Les ombres dansent sans bruit",
-    "Un papillon bleu s'envole",
-    "La pluie caresse la terre",
-    "L'étoile brille dans la nuit"
+
+  const VERS_POS_1 = [
+    "Le sac sur l'épaule,",
+    "Sur la table neuve,",
+    "Sous le voile sombre,",
+    "Graine en plein sillon,",
+    "Pierre sur le roc,",
+    "Entre deux piliers,",
+    "Au croisement nu,",
+    "Deux sphinx attelés,",
+    "Plateaux de métal,",
+    "Pas lents dans la nuit,",
+    "Le cercle a tourné,",
+    "Le feu maîtrisé,",
+    "Liens noués au bois,",
+    "Épis moissonnés,",
+    "Deux coupes d'argent,",
+    "Chaînes au brasier,",
+    "Tour dressée trop haut,",
+    "Cruches d'eau versées,",
+    "Reflets sur l'étang,",
+    "L'ombre derrière soi,",
+    "Appel sous la dalle,",
+    "Quatre coins du ciel,"
+  ];
+
+  const VERS_POS_2 = [
+    "Au bord du gouffre sans nom,",
+    "La main choisit ses outils,",
+    "Le livre scellé d'argent,",
+    "L'étoile au front souverain,",
+    "L'équerre trace la loi,",
+    "Le souffle unit les esprits,",
+    "Le cœur hésite et frémit,",
+    "Les rênes fermes en main,",
+    "Le glaive tranche le doute,",
+    "La lampe sous le manteau,",
+    "La main saisit le pivot,",
+    "Douceur sur la gueule ouverte,",
+    "Le ciel regarde à l'envers,",
+    "L'acier dénude le sol,",
+    "L'eau pure passe sans bruit,",
+    "Les torches dansent la nuit,",
+    "L'éclair frappe le donjon,",
+    "À genoux sous l'astre clair,",
+    "Deux tours veillent dans le bleu,",
+    "Le grand jour chauffe la pierre,",
+    "L'éclat d'or fend le silence,",
+    "Danse au cœur de la couronne,"
+  ];
+
+  const VERS_POS_3 = [
+    "Le vent libre appelle.",
+    "L'œuvre prend racine.",
+    "L'ombre se dévoile.",
+    "Le verbe fleurit.",
+    "L'édifice tient.",
+    "Le lien s'accomplit.",
+    "La voie se décide.",
+    "Le char passe en roi.",
+    "Tout reprend son poids.",
+    "Le sentier s'éclaire.",
+    "Le sort se renverse.",
+    "Le calme triomphe.",
+    "L'être lâche prise.",
+    "Un germe renaît.",
+    "La fièvre s'apaise.",
+    "Le pacte se brise.",
+    "Les murs s'ouvrent nus.",
+    "La terre reverdit.",
+    "Le songe s'éveille.",
+    "La joie rayonne.",
+    "L'âme se relève.",
+    "Le cycle est entier."
   ];
 
   let wasmExports = null;
 
-  function rafraichirAffichage() {
-    wasmExports.nouveauHaiku();
+  function rafraichirTirage() {
+    wasmExports.tirerTriade();
 
-    const v1 = VERS_5[wasmExports.getIndexVers(1)];
-    const v2 = VERS_7[wasmExports.getIndexVers(2)];
-    const v3 = VERS_5[wasmExports.getIndexVers(3)];
+    const i1 = wasmExports.getLame(1);
+    const i2 = wasmExports.getLame(2);
+    const i3 = wasmExports.getLame(3);
+
+    const v1 = VERS_POS_1[i1];
+    const v2 = VERS_POS_2[i2];
+    const v3 = VERS_POS_3[i3];
+
+    document.getElementById("triade").innerHTML = `
+      <div class="lame-card">
+        <span class="lame-pos">I · Passé</span>
+        <span class="lame-nom">${ARCANES[i1]}</span>
+      </div>
+      <div class="lame-card">
+        <span class="lame-pos">II · Présent</span>
+        <span class="lame-nom">${ARCANES[i2]}</span>
+      </div>
+      <div class="lame-card">
+        <span class="lame-pos">III · Futur</span>
+        <span class="lame-nom">${ARCANES[i3]}</span>
+      </div>
+    `;
 
     document.getElementById("poeme").innerHTML = `${v1}<br>${v2}<br>${v3}`;
 
@@ -93,25 +244,25 @@
     const rime = wasmExports.aRimeEmbrassee() === 1;
 
     document.getElementById("analyse").innerHTML = `
+      <strong>Scansion métrique (Java WebAssembly) :</strong>
       <ul>
-        <li>Vers 1 : « ${v1} » — <strong>${s1} syllabes</strong></li>
-        <li>Vers 2 : « ${v2} » — <strong>${s2} syllabes</strong></li>
-        <li>Vers 3 : « ${v3} » — <strong>${s3} syllabes</strong></li>
+        <li>Vers 1 (${ARCANES[i1]}) : <strong>${s1} syllabes</strong></li>
+        <li>Vers 2 (${ARCANES[i2]}) : <strong>${s2} syllabes</strong></li>
+        <li>Vers 3 (${ARCANES[i3]}) : <strong>${s3} syllabes</strong></li>
       </ul>
-      <p>Rime embrassée (Vers 1 & 3) : <strong>${rime ? "Oui" : "Non (vers libres)"}</strong></p>
+      <div>Rime embrassée (Vers 1 & 3) : <strong>${rime ? "Oui" : "Non (vers libres)"}</strong></div>
     `;
   }
 
   window.addEventListener("load", async () => {
     try {
-      // Fournit les fonctions système attendues par le binaire TeaVM Wasm
       const importObject = {
         teavm: {
           currentTimeMillis: () => Date.now(),
           nanoTime: () => performance.now() * 1000000,
-          putwchar: (c) => {},
-          logString: (s) => {},
-          logInt: (i) => {},
+          putwchar: () => {},
+          logString: () => {},
+          logInt: () => {},
           logOutOfMemory: () => console.error("Wasm OutOfMemory")
         },
         teavmMath: Math
@@ -119,7 +270,7 @@
 
       const response = await fetch("classes.wasm");
       if (!response.ok) {
-        throw new Error(`Fichier classes.wasm introuvable (HTTP ${response.status})`);
+        throw new Error(`classes.wasm introuvable (HTTP ${response.status})`);
       }
       const bytes = await response.arrayBuffer();
       const { instance } = await WebAssembly.instantiate(bytes, importObject);
@@ -131,8 +282,8 @@
 
       const btn = document.getElementById("btn-generer");
       btn.disabled = false;
-      btn.addEventListener("click", rafraichirAffichage);
-      rafraichirAffichage();
+      btn.addEventListener("click", rafraichirTirage);
+      rafraichirTirage();
     } catch (err) {
       document.getElementById("poeme").textContent = "Erreur Wasm : " + err.message;
       console.error(err);
