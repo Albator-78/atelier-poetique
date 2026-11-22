@@ -2,31 +2,94 @@ import org.teavm.interop.Export;
 
 public class AtelierPoetique {
 
-    private static final String[] VERS_5_SYLLABES = {
-        "Le vent d'automne",
-        "Sous la lune claire",
-        "Une feuille tombe",
-        "L'eau calme du lac",
-        "Dans le silence"
+    // Position 1 : Passé / Origine (5 syllabes)
+    private static final String[] VERS_POS_1 = {
+        "Le sac sur l'épaule,",
+        "Sur la table neuve,",
+        "Sous le voile sombre,",
+        "Graine en plein sillon,",
+        "Pierre sur le roc,",
+        "Entre deux piliers,",
+        "Au croisement nu,",
+        "Deux sphinx attelés,",
+        "Plateaux de métal,",
+        "Pas lents dans la nuit,",
+        "Le cercle a tourné,",
+        "Le feu maîtrisé,",
+        "Liens noués au bois,",
+        "Épis moissonnés,",
+        "Deux coupes d'argent,",
+        "Chaînes au brasier,",
+        "Tour dressée trop haut,",
+        "Cruches d'eau versées,",
+        "Reflets sur l'étang,",
+        "L'ombre derrière soi,",
+        "Appel sous la dalle,",
+        "Quatre coins du ciel,"
     };
 
-    private static final String[] VERS_7_SYLLABES = {
-        "Murmure à travers les bois",
-        "Les ombres dansent sans bruit",
-        "Un papillon bleu s'envole",
-        "La pluie caresse la terre",
-        "L'étoile brille dans la nuit"
+    // Position 2 : Présent / Action (7 syllabes)
+    private static final String[] VERS_POS_2 = {
+        "Au bord du gouffre sans nom,",
+        "La main choisit ses outils,",
+        "Le livre scellé d'argent,",
+        "L'étoile au front souverain,",
+        "L'équerre trace la loi,",
+        "Le souffle unit les esprits,",
+        "Le cœur hésite et frémit,",
+        "Les rênes fermes en main,",
+        "Le glaive tranche le doute,",
+        "La lampe sous le manteau,",
+        "La main saisit le pivot,",
+        "Douceur sur la gueule ouverte,",
+        "Le ciel regarde à l'envers,",
+        "L'acier dénude le sol,",
+        "L'eau pure passe sans bruit,",
+        "Les torches dansent la nuit,",
+        "L'éclair frappe le donjon,",
+        "À genoux sous l'astre clair,",
+        "Deux tours veillent dans le bleu,",
+        "Le grand jour chauffe la pierre,",
+        "L'éclat d'or fend le silence,",
+        "Danse au cœur de la couronne,"
+    };
+
+    // Position 3 : Futur / Perspective (5 syllabes)
+    private static final String[] VERS_POS_3 = {
+        "Le vent libre appelle.",
+        "L'œuvre prend racine.",
+        "L'ombre se dévoile.",
+        "Le verbe fleurit.",
+        "L'édifice tient.",
+        "Le lien s'accomplit.",
+        "La voie se décide.",
+        "Le char passe en roi.",
+        "Tout reprend son poids.",
+        "Le sentier s'éclaire.",
+        "Le sort se renverse.",
+        "Le calme triomphe.",
+        "L'être lâche prise.",
+        "Un germe renaît.",
+        "La fièvre s'apaise.",
+        "Le pacte se brise.",
+        "Les murs s'ouvrent nus.",
+        "La terre reverdit.",
+        "Le songe s'éveille.",
+        "La joie rayonne.",
+        "L'âme se relève.",
+        "Le cycle est entier."
     };
 
     private static final String VOYELLES = "aeiouyàâäéèêëîïôöùûüÿ";
     private static long graine = System.currentTimeMillis();
 
-    private static int idx1 = 0;
-    private static int idx2 = 0;
-    private static int idx3 = 1;
+    // Indices des 3 lames tirées (0 à 21)
+    private static int lame1 = 0;
+    private static int lame2 = 1;
+    private static int lame3 = 2;
 
     public static void main(String[] args) {
-        nouveauHaiku();
+        tirerTriade();
     }
 
     private static int aleatoire(int max) {
@@ -35,60 +98,79 @@ public class AtelierPoetique {
         return (valeur < 0 ? -valeur : valeur) % max;
     }
 
-    @Export(name = "nouveauHaiku")
-    public static void nouveauHaiku() {
-        idx1 = aleatoire(VERS_5_SYLLABES.length);
-        idx2 = aleatoire(VERS_7_SYLLABES.length);
+    @Export(name = "tirerTriade")
+    public static void tirerTriade() {
+        int total = VERS_POS_1.length; // 22 arcanes majeurs
+        lame1 = aleatoire(total);
         do {
-            idx3 = aleatoire(VERS_5_SYLLABES.length);
-        } while (idx3 == idx1);
+            lame2 = aleatoire(total);
+        } while (lame2 == lame1);
+        do {
+            lame3 = aleatoire(total);
+        } while (lame3 == lame1 || lame3 == lame2);
+    }
+
+    @Export(name = "getLame")
+    public static int getLame(int position) {
+        if (position == 1) return lame1;
+        if (position == 2) return lame2;
+        return lame3;
     }
 
     @Export(name = "getSyllabesVers")
-    public static int getSyllabesVers(int numeroVers) {
-        String vers = getTexteVers(numeroVers);
-        return compterSyllabes(vers);
-    }
-
-    @Export(name = "getIndexVers")
-    public static int getIndexVers(int numeroVers) {
-        if (numeroVers == 1) return idx1;
-        if (numeroVers == 2) return idx2;
-        return idx3;
+    public static int getSyllabesVers(int position) {
+        if (position == 1) return compterSyllabes(VERS_POS_1[lame1]);
+        if (position == 2) return compterSyllabes(VERS_POS_2[lame2]);
+        return compterSyllabes(VERS_POS_3[lame3]);
     }
 
     @Export(name = "aRimeEmbrassee")
     public static int aRimeEmbrassee() {
-        return rimentEnsemble(VERS_5_SYLLABES[idx1], VERS_5_SYLLABES[idx3]) ? 1 : 0;
-    }
-
-    private static String getTexteVers(int numeroVers) {
-        if (numeroVers == 1) return VERS_5_SYLLABES[idx1];
-        if (numeroVers == 2) return VERS_7_SYLLABES[idx2];
-        return VERS_5_SYLLABES[idx3];
+        return rimentEnsemble(VERS_POS_1[lame1], VERS_POS_3[lame3]) ? 1 : 0;
     }
 
     public static int compterSyllabes(String vers) {
-        String texte = vers.toLowerCase().trim();
-        int compteur = 0;
-        boolean dansGroupeVoyelles = false;
+        String texte = vers.toLowerCase().trim()
+                           .replaceAll("[^a-zàâäéèêëîïôöùûüÿ\\s'-]", "")
+                           .replace("'", " ")
+                           .replace("-", " ");
+        String[] mots = texte.split("\\s+");
+        int totalSyllabes = 0;
 
-        for (int i = 0; i < texte.length(); i++) {
-            char c = texte.charAt(i);
-            if (VOYELLES.indexOf(c) >= 0) {
-                if (!dansGroupeVoyelles) {
-                    compteur++;
-                    dansGroupeVoyelles = true;
+        for (int m = 0; m < mots.length; m++) {
+            String mot = mots[m];
+            if (mot.isEmpty()) continue;
+
+            int syllabesMot = 0;
+            boolean dansVoyelles = false;
+            for (int i = 0; i < mot.length(); i++) {
+                char c = mot.charAt(i);
+                if (VOYELLES.indexOf(c) >= 0) {
+                    if (!dansVoyelles) {
+                        syllabesMot++;
+                        dansVoyelles = true;
+                    }
+                } else {
+                    dansVoyelles = false;
                 }
-            } else {
-                dansGroupeVoyelles = false;
             }
-        }
 
-        if (texte.endsWith("e") || texte.endsWith("es") || texte.endsWith("ent")) {
-            compteur--;
+            // Élision du 'e' final devant voyelle suivante ou en fin de vers
+            boolean finDeVers = (m == mots.length - 1);
+            boolean suiviDeVoyelle = false;
+            if (!finDeVers && !mots[m + 1].isEmpty()) {
+                char initialeSuivante = mots[m + 1].charAt(0);
+                suiviDeVoyelle = (VOYELLES.indexOf(initialeSuivante) >= 0);
+            }
+
+            if (syllabesMot > 1 && (finDeVers || suiviDeVoyelle)) {
+                if (mot.endsWith("e") || mot.endsWith("es") || (finDeVers && mot.endsWith("ent"))) {
+                    syllabesMot--;
+                }
+            }
+            totalSyllabes += Math.max(1, syllabesMot);
         }
-        return Math.max(1, compteur);
+        return Math.max(1, totalSyllabes);
     }
 
     public static boolean rimentEnsemble(String vers1, String vers2) {
