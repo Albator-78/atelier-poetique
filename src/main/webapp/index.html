@@ -49,22 +49,68 @@
       font-size: 0.9rem;
     }
   </style>
-  <!-- Chargeur WebAssembly généré par TeaVM -->
-  <script type="text/javascript" charset="utf-8" src="wasm-runtime.js"></script>
-  <script>
-    window.addEventListener("load", () => {
-      TeaVM.wasm.run("classes.wasm");
-    });
-  </script>
+  <script src="classes.wasm-runtime.js"></script>
 </head>
 <body>
 
 <div class="container">
   <h1>Atelier Poétique (Java Wasm)</h1>
   <div class="poeme-box" id="poeme">Chargement du module WebAssembly...</div>
-  <button id="btn-generer">Composer un nouveau haïku</button>
+  <button id="btn-generer" disabled>Composer un nouveau haïku</button>
   <div class="analyse" id="analyse"></div>
 </div>
+
+<script>
+  const VERS_5 = [
+    "Le vent d'automne",
+    "Sous la lune claire",
+    "Une feuille tombe",
+    "L'eau calme du lac",
+    "Dans le silence"
+  ];
+  const VERS_7 = [
+    "Murmure à travers les bois",
+    "Les ombres dansent sans bruit",
+    "Un papillon bleu s'envole",
+    "La pluie caresse la terre",
+    "L'étoile brille dans la nuit"
+  ];
+
+  let wasmExports = null;
+
+  function rafraichirAffichage() {
+    wasmExports.nouveauHaiku();
+
+    const v1 = VERS_5[wasmExports.getIndexVers(1)];
+    const v2 = VERS_7[wasmExports.getIndexVers(2)];
+    const v3 = VERS_5[wasmExports.getIndexVers(3)];
+
+    document.getElementById("poeme").innerHTML = `${v1}<br>${v2}<br>${v3}`;
+
+    const s1 = wasmExports.getSyllabesVers(1);
+    const s2 = wasmExports.getSyllabesVers(2);
+    const s3 = wasmExports.getSyllabesVers(3);
+    const rime = wasmExports.aRimeEmbrassee() === 1;
+
+    document.getElementById("analyse").innerHTML = `
+      <ul>
+        <li>Vers 1 : « ${v1} » — <strong>${s1} syllabes</strong></li>
+        <li>Vers 2 : « ${v2} » — <strong>${s2} syllabes</strong></li>
+        <li>Vers 3 : « ${v3} » — <strong>${s3} syllabes</strong></li>
+      </ul>
+      <p>Rime embrassée (Vers 1 & 3) : <strong>${rime ? "Oui" : "Non (vers libres)"}</strong></p>
+    `;
+  }
+
+  window.addEventListener("load", async () => {
+    const teavm = await TeaVM.wasm.load("classes.wasm");
+    wasmExports = teavm.exports;
+    const btn = document.getElementById("btn-generer");
+    btn.disabled = false;
+    btn.addEventListener("click", rafraichirAffichage);
+    rafraichirAffichage();
+  });
+</script>
 
 </body>
 </html>
