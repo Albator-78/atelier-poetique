@@ -14,8 +14,13 @@
         <teavm.version>0.10.0</teavm.version>
     </properties>
 
-    <dependencies>
-        <!-- API TeaVM pour interagir avec le DOM HTML depuis Java -->
+        <dependencies>
+        <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-classlib</artifactId>
+            <version>${teavm.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.teavm</groupId>
             <artifactId>teavm-jso-apis</artifactId>
@@ -23,6 +28,7 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
