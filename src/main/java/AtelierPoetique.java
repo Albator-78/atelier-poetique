@@ -1,5 +1,4 @@
-import org.teavm.jso.dom.html.HTMLDocument;
-import org.teavm.jso.dom.html.HTMLElement;
+import org.teavm.interop.Export;
 
 public class AtelierPoetique {
 
@@ -20,9 +19,15 @@ public class AtelierPoetique {
     };
 
     private static final String VOYELLES = "aeiouyàâäéèêëîïôöùûüÿ";
-
-    // Générateur pseudo-aléatoire autonome (sans java.util.Random)
     private static long graine = System.currentTimeMillis();
+
+    private static int idx1 = 0;
+    private static int idx2 = 0;
+    private static int idx3 = 1;
+
+    public static void main(String[] args) {
+        nouveauHaiku();
+    }
 
     private static int aleatoire(int max) {
         graine = (graine * 6364136223846793005L + 1442695040888963407L);
@@ -30,47 +35,37 @@ public class AtelierPoetique {
         return (valeur < 0 ? -valeur : valeur) % max;
     }
 
-    public static void main(String[] args) {
-        HTMLDocument document = HTMLDocument.current();
-        HTMLElement bouton = document.getElementById("btn-generer");
-
-        afficherHaiku(document);
-
-        bouton.addEventListener("click", evt -> afficherHaiku(document));
-    }
-
-    private static void afficherHaiku(HTMLDocument document) {
-        String[] haiku = genererHaiku();
-
-        HTMLElement poemeEl = document.getElementById("poeme");
-        poemeEl.setInnerHTML(haiku[0] + "<br>" + haiku[1] + "<br>" + haiku[2]);
-
-        StringBuilder analyseHtml = new StringBuilder("<ul>");
-        for (int i = 0; i < haiku.length; i++) {
-            int syllabes = compterSyllabes(haiku[i]);
-            analyseHtml.append("<li>Vers ").append(i + 1)
-                       .append(" : « ").append(haiku[i]).append(" » — <strong>")
-                       .append(syllabes).append(" syllabes</strong></li>");
-        }
-        analyseHtml.append("</ul>");
-
-        boolean rime = rimentEnsemble(haiku[0], haiku[2]);
-        analyseHtml.append("<p>Rime embrassée (Vers 1 & 3) : <strong>")
-                   .append(rime ? "Oui" : "Non (vers libres)")
-                   .append("</strong></p>");
-
-        document.getElementById("analyse").setInnerHTML(analyseHtml.toString());
-    }
-
-    public static String[] genererHaiku() {
-        String v1 = VERS_5_SYLLABES[aleatoire(VERS_5_SYLLABES.length)];
-        String v2 = VERS_7_SYLLABES[aleatoire(VERS_7_SYLLABES.length)];
-        String v3;
+    @Export(name = "nouveauHaiku")
+    public static void nouveauHaiku() {
+        idx1 = aleatoire(VERS_5_SYLLABES.length);
+        idx2 = aleatoire(VERS_7_SYLLABES.length);
         do {
-            v3 = VERS_5_SYLLABES[aleatoire(VERS_5_SYLLABES.length)];
-        } while (v3.equals(v1));
+            idx3 = aleatoire(VERS_5_SYLLABES.length);
+        } while (idx3 == idx1);
+    }
 
-        return new String[]{v1, v2, v3};
+    @Export(name = "getSyllabesVers")
+    public static int getSyllabesVers(int numeroVers) {
+        String vers = getTexteVers(numeroVers);
+        return compterSyllabes(vers);
+    }
+
+    @Export(name = "getIndexVers")
+    public static int getIndexVers(int numeroVers) {
+        if (numeroVers == 1) return idx1;
+        if (numeroVers == 2) return idx2;
+        return idx3;
+    }
+
+    @Export(name = "aRimeEmbrassee")
+    public static int aRimeEmbrassee() {
+        return rimentEnsemble(VERS_5_SYLLABES[idx1], VERS_5_SYLLABES[idx3]) ? 1 : 0;
+    }
+
+    private static String getTexteVers(int numeroVers) {
+        if (numeroVers == 1) return VERS_5_SYLLABES[idx1];
+        if (numeroVers == 2) return VERS_7_SYLLABES[idx2];
+        return VERS_5_SYLLABES[idx3];
     }
 
     public static int compterSyllabes(String vers) {
