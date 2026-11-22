@@ -1,48 +1,41 @@
-import java.util.List;
-import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.teavm.jso.dom.html.HTMLDocument;
 import org.teavm.jso.dom.html.HTMLElement;
-import org.teavm.jso.dom.events.EventListener;
 
 public class AtelierPoetique {
 
-    private static final List<String> VERS_5_SYLLABES = List.of(
+    private static final String[] VERS_5_SYLLABES = {
         "Le vent d'automne",
         "Sous la lune claire",
         "Une feuille tombe",
         "L'eau calme du lac",
         "Dans le silence"
-    );
+    };
 
-    private static final List<String> VERS_7_SYLLABES = List.of(
+    private static final String[] VERS_7_SYLLABES = {
         "Murmure à travers les bois",
         "Les ombres dansent sans bruit",
         "Un papillon bleu s'envole",
         "La pluie caresse la terre",
         "L'étoile brille dans la nuit"
-    );
+    };
+
+    private static final String VOYELLES = "aeiouyàâäéèêëîïôöùûüÿ";
 
     public static void main(String[] args) {
         HTMLDocument document = HTMLDocument.current();
         HTMLElement bouton = document.getElementById("btn-generer");
 
-        // Affichage initial au chargement
         afficherHaiku(document);
 
-        // Liaison du clic bouton en Java natif compilé en Wasm
-        bouton.addEventListener("click", (EventListener<?>) evt -> afficherHaiku(document));
+        bouton.addEventListener("click", evt -> afficherHaiku(document));
     }
 
     private static void afficherHaiku(HTMLDocument document) {
         String[] haiku = genererHaiku();
 
-        // Injection du poème dans le HTML
         HTMLElement poemeEl = document.getElementById("poeme");
-        poemeEl.setInnerHTML(String.join("<br>", haiku));
+        poemeEl.setInnerHTML(haiku[0] + "<br>" + haiku[1] + "<br>" + haiku[2]);
 
-        // Injection de l'analyse métrique et sonore
         StringBuilder analyseHtml = new StringBuilder("<ul>");
         for (int i = 0; i < haiku.length; i++) {
             int syllabes = compterSyllabes(haiku[i]);
@@ -60,26 +53,32 @@ public class AtelierPoetique {
         document.getElementById("analyse").setInnerHTML(analyseHtml.toString());
     }
 
-        public static String[] genererHaiku() {
-        String v1 = VERS_5_SYLLABES.get((int) (Math.random() * VERS_5_SYLLABES.size()));
-        String v2 = VERS_7_SYLLABES.get((int) (Math.random() * VERS_7_SYLLABES.size()));
+    public static String[] genererHaiku() {
+        String v1 = VERS_5_SYLLABES[(int) (Math.random() * VERS_5_SYLLABES.length)];
+        String v2 = VERS_7_SYLLABES[(int) (Math.random() * VERS_7_SYLLABES.length)];
         String v3;
         do {
-            v3 = VERS_5_SYLLABES.get((int) (Math.random() * VERS_5_SYLLABES.size()));
+            v3 = VERS_5_SYLLABES[(int) (Math.random() * VERS_5_SYLLABES.length)];
         } while (v3.equals(v1));
 
         return new String[]{v1, v2, v3};
     }
 
-
     public static int compterSyllabes(String vers) {
         String texte = vers.toLowerCase().trim();
-        Pattern groupeVoyelles = Pattern.compile("[aeiouyàâäéèêëîïôöùûüÿ]+");
-        Matcher matcher = groupeVoyelles.matcher(texte);
-
         int compteur = 0;
-        while (matcher.find()) {
-            compteur++;
+        boolean dansGroupeVoyelles = false;
+
+        for (int i = 0; i < texte.length(); i++) {
+            char c = texte.charAt(i);
+            if (VOYELLES.indexOf(c) >= 0) {
+                if (!dansGroupeVoyelles) {
+                    compteur++;
+                    dansGroupeVoyelles = true;
+                }
+            } else {
+                dansGroupeVoyelles = false;
+            }
         }
 
         if (texte.endsWith("e") || texte.endsWith("es") || texte.endsWith("ent")) {
@@ -98,8 +97,18 @@ public class AtelierPoetique {
     }
 
     private static String nettoyerFinDeVers(String vers) {
-        return vers.toLowerCase()
-                   .replaceAll("[^a-zàâäéèêëîïôöùûüÿ]", "")
-                   .replaceAll("e$", "");
+        String s = vers.toLowerCase();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if ((c >= 'a' && c <= 'z') || VOYELLES.indexOf(c) >= 0) {
+                sb.append(c);
+            }
+        }
+        String propre = sb.toString();
+        if (propre.endsWith("e")) {
+            propre = propre.substring(0, propre.length() - 1);
+        }
+        return propre;
     }
 }
