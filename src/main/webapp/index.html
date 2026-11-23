@@ -2,294 +2,1205 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tarot Poétique — Triade en Haïku (Java Wasm)</title>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Atelier poétique relié à l’Oracle Yi King et à une triade du Tarot."
+  >
+
+  <meta name="theme-color" content="#8c4a32">
+
+  <title>Tarot poétique — Triade en haïku</title>
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
     body {
-      font-family: "Georgia", serif;
-      background: #faf8f5;
-      color: #2c2a29;
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
       display: flex;
       justify-content: center;
       padding: 2rem 1rem;
-      margin: 0;
+      background: #faf8f5;
+      color: #2c2a29;
+      font-family: Georgia, serif;
     }
+
     .container {
-      max-width: 640px;
       width: 100%;
-      background: #fff;
+      max-width: 720px;
       padding: 2.25rem;
-      border-radius: 8px;
+      background: #fff;
       border: 1px solid #e6e0d8;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
     }
+
     h1 {
-      color: #8c4a32;
-      text-align: center;
-      font-size: 1.45rem;
       margin-top: 0;
+      margin-bottom: 0.55rem;
+      color: #8c4a32;
+      font-size: clamp(1.45rem, 5vw, 2rem);
+      line-height: 1.25;
+      text-align: center;
     }
+
+    .sous-titre {
+      margin: 0 auto 1.5rem;
+      color: #7a746e;
+      font-family: system-ui, sans-serif;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    /* ========== CONTEXTE YI KING ========== */
+
+    .contexte-yijing {
+      margin: 1.25rem 0;
+      padding: 1rem 1.15rem;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(140, 74, 50, 0.08),
+          rgba(245, 238, 228, 0.7)
+        );
+      border: 1px solid #d8c7b8;
+      border-left: 4px solid #8c4a32;
+      border-radius: 7px;
+      color: #55504c;
+      font-family: system-ui, sans-serif;
+      font-size: 0.86rem;
+      line-height: 1.65;
+    }
+
+    .contexte-yijing[hidden] {
+      display: none;
+    }
+
+    .contexte-yijing strong {
+      color: #8c4a32;
+    }
+
+    .contexte-yijing-title {
+      margin-bottom: 0.55rem;
+      color: #8c4a32;
+      font-family: Georgia, serif;
+      font-size: 1.05rem;
+      font-weight: bold;
+    }
+
+    .contexte-yijing-evolution {
+      margin-top: 0.65rem;
+      padding-top: 0.55rem;
+      border-top: 1px solid rgba(140, 74, 50, 0.18);
+      font-family: Georgia, serif;
+      font-style: italic;
+    }
+
+    /* ========== TRIADE ========== */
+
     .triade {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 0.75rem;
       margin: 1.25rem 0;
       font-family: system-ui, sans-serif;
     }
+
     .lame-card {
+      min-width: 0;
+      padding: 0.9rem 0.65rem;
       background: #faf8f5;
       border: 1px solid #e6e0d8;
-      border-radius: 6px;
-      padding: 0.75rem 0.5rem;
+      border-radius: 7px;
       text-align: center;
     }
+
     .lame-pos {
       display: block;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
+      min-height: 2em;
+      margin-bottom: 0.45rem;
       color: #7a746e;
-      margin-bottom: 0.35rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
     }
+
     .lame-nom {
-      font-weight: 700;
-      font-size: 0.9rem;
+      display: block;
       color: #2c2a29;
+      font-family: Georgia, serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.4;
     }
+
+    .tarot-question {
+      margin-top: 0.65rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid #e6e0d8;
+      color: #7a746e;
+      font-family: Georgia, serif;
+      font-size: 0.76rem;
+      font-style: italic;
+      line-height: 1.45;
+    }
+
+    /* ========== POÈME ========== */
+
+    .poeme-label {
+      margin-top: 1.6rem;
+      margin-bottom: -0.8rem;
+      color: #8c4a32;
+      font-family: system-ui, sans-serif;
+      font-size: 0.76rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
     .poeme-box {
+      margin: 1.5rem 0;
+      padding: 1.5rem;
       background: #faf8f5;
       border-left: 3px solid #8c4a32;
-      padding: 1.5rem;
-      margin: 1.5rem 0;
-      font-size: 1.25rem;
-      line-height: 1.85;
+      color: #3a3532;
+      font-size: clamp(1.08rem, 4vw, 1.28rem);
       font-style: italic;
+      line-height: 1.85;
     }
+
+    /* ========== BOUTONS ========== */
+
     button {
       width: 100%;
-      padding: 0.9rem;
+      padding: 0.9rem 1rem;
       background: #8c4a32;
       color: #fff;
       border: none;
-      border-radius: 5px;
-      font-size: 1rem;
+      border-radius: 6px;
       font-family: system-ui, sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.4;
       cursor: pointer;
+      transition:
+        opacity 0.2s,
+        transform 0.2s,
+        box-shadow 0.2s;
     }
-    button:hover:not(:disabled) { opacity: 0.92; }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    button:hover:not(:disabled) {
+      opacity: 0.94;
+      transform: translateY(-1px);
+      box-shadow: 0 5px 14px rgba(140, 74, 50, 0.2);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(140, 74, 50, 0.35);
+      outline-offset: 3px;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-retour {
+      display: block;
+      width: 100%;
+      margin-top: 0.75rem;
+      padding: 0.8rem 1rem;
+      background: transparent;
+      color: #8c4a32;
+      border: 1px solid #caa994;
+      border-radius: 6px;
+      font-family: system-ui, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .btn-retour:hover {
+      background: rgba(140, 74, 50, 0.06);
+    }
+
+    /* ========== ANALYSE ========== */
+
     .analyse {
       margin-top: 1.5rem;
       padding-top: 1rem;
       border-top: 1px solid #e6e0d8;
+      color: #55504c;
       font-family: system-ui, sans-serif;
       font-size: 0.88rem;
-      color: #55504c;
+      line-height: 1.6;
     }
+
+    .analyse-title {
+      color: #8c4a32;
+      font-family: Georgia, serif;
+      font-size: 1rem;
+    }
+
     .analyse ul {
-      padding-left: 1.2rem;
-      margin: 0.5rem 0 0.75rem 0;
+      margin: 0.65rem 0 0.8rem;
+      padding-left: 1.25rem;
     }
-    .analyse li { margin-bottom: 0.35rem; }
+
+    .analyse li {
+      margin-bottom: 0.45rem;
+    }
+
+    .atelier-note {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: rgba(140, 74, 50, 0.05);
+      border-radius: 5px;
+      color: #7a746e;
+      font-family: system-ui, sans-serif;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .erreur {
+      color: #8b1e1e;
+      font-style: normal;
+    }
+
+    @media (max-width: 620px) {
+      body {
+        padding: 1rem 0.7rem;
+      }
+
+      .container {
+        padding: 1.4rem 1rem;
+      }
+
+      .triade {
+        grid-template-columns: 1fr;
+      }
+
+      .lame-pos {
+        min-height: auto;
+      }
+
+      .poeme-box {
+        padding: 1.15rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
   </style>
 </head>
+
 <body>
 
-<div class="container">
-  <h1>Tarot Poétique — Triade en Haïku</h1>
+  <main class="container">
+    <h1>Tarot poétique — Triade en haïku</h1>
 
-  <div class="triade" id="triade"></div>
+    <p class="sous-titre">
+      Une résonance poétique entre le Tarot, le Yi King
+      et les mouvements de la transformation.
+    </p>
 
-  <div class="poeme-box" id="poeme">Chargement du module WebAssembly...</div>
+    <section
+      class="contexte-yijing"
+      id="contexte-yijing"
+      aria-label="Contexte du tirage Yi King"
+      hidden
+    ></section>
 
-  <button id="btn-generer" disabled>Tirer une nouvelle triade</button>
+    <section
+      class="triade"
+      id="triade"
+      aria-label="Triade du Tarot"
+    ></section>
 
-  <div class="analyse" id="analyse"></div>
-</div>
+    <div class="poeme-label">Résonance poétique</div>
 
-<script>
-  const ARCANES = [
-    "0 · Le Mat",
-    "I · Le Bateleur",
-    "II · La Papesse",
-    "III · L'Impératrice",
-    "IV · L'Empereur",
-    "V · Le Pape",
-    "VI · L'Amoureux",
-    "VII · Le Chariot",
-    "VIII · La Justice",
-    "IX · L'Hermite",
-    "X · La Roue de Fortune",
-    "XI · La Force",
-    "XII · Le Pendu",
-    "XIII · L'Arcane sans nom",
-    "XIV · Tempérance",
-    "XV · Le Diable",
-    "XVI · La Maison Dieu",
-    "XVII · L'Étoile",
-    "XVIII · La Lune",
-    "XIX · Le Soleil",
-    "XX · Le Jugement",
-    "XXI · Le Monde"
-  ];
+    <div
+      class="poeme-box"
+      id="poeme"
+      aria-live="polite"
+    >
+      Chargement du module WebAssembly…
+    </div>
 
-  const VERS_POS_1 = [
-    "Le sac sur l'épaule,",
-    "Sur la table neuve,",
-    "Sous le voile sombre,",
-    "Graine en plein sillon,",
-    "Pierre sur le roc,",
-    "Entre deux piliers,",
-    "Au croisement nu,",
-    "Deux sphinx attelés,",
-    "Plateaux de métal,",
-    "Pas lents dans la nuit,",
-    "Le cercle a tourné,",
-    "Le feu maîtrisé,",
-    "Liens noués au bois,",
-    "Épis moissonnés,",
-    "Deux coupes d'argent,",
-    "Chaînes au brasier,",
-    "Tour dressée trop haut,",
-    "Cruches d'eau versées,",
-    "Reflets sur l'étang,",
-    "L'ombre derrière soi,",
-    "Appel sous la dalle,",
-    "Quatre coins du ciel,"
-  ];
+    <button
+      id="btn-generer"
+      type="button"
+      disabled
+    >
+      Tirer une nouvelle triade
+    </button>
 
-  const VERS_POS_2 = [
-    "Au bord du gouffre sans nom,",
-    "La main choisit ses outils,",
-    "Le livre scellé d'argent,",
-    "L'étoile au front souverain,",
-    "L'équerre trace la loi,",
-    "Le souffle unit les esprits,",
-    "Le cœur hésite et frémit,",
-    "Les rênes fermes en main,",
-    "Le glaive tranche le doute,",
-    "La lampe sous le manteau,",
-    "La main saisit le pivot,",
-    "Douceur sur la gueule ouverte,",
-    "Le ciel regarde à l'envers,",
-    "L'acier dénude le sol,",
-    "L'eau pure passe sans bruit,",
-    "Les torches dansent la nuit,",
-    "L'éclair frappe le donjon,",
-    "À genoux sous l'astre clair,",
-    "Deux tours veillent dans le bleu,",
-    "Le grand jour chauffe la pierre,",
-    "L'éclat d'or fend le silence,",
-    "Danse au cœur de la couronne,"
-  ];
+    <a
+      class="btn-retour"
+      id="btn-retour-oracle"
+      href="https://albator-78.github.io/oracle-complet-yiking/"
+      hidden
+    >
+      ☯ Retourner à l’Oracle Yi King
+    </a>
 
-  const VERS_POS_3 = [
-    "Le vent libre appelle.",
-    "L'œuvre prend racine.",
-    "L'ombre se dévoile.",
-    "Le verbe fleurit.",
-    "L'édifice tient.",
-    "Le lien s'accomplit.",
-    "La voie se décide.",
-    "Le char passe en roi.",
-    "Tout reprend son poids.",
-    "Le sentier s'éclaire.",
-    "Le sort se renverse.",
-    "Le calme triomphe.",
-    "L'être lâche prise.",
-    "Un germe renaît.",
-    "La fièvre s'apaise.",
-    "Le pacte se brise.",
-    "Les murs s'ouvrent nus.",
-    "La terre reverdit.",
-    "Le songe s'éveille.",
-    "La joie rayonne.",
-    "L'âme se relève.",
-    "Le cycle est entier."
-  ];
+    <section
+      class="analyse"
+      id="analyse"
+      aria-live="polite"
+    ></section>
+  </main>
 
-  let wasmExports = null;
+  <script>
+    'use strict';
 
-  function rafraichirTirage() {
-    wasmExports.tirerTriade();
+    // =====================================================
+    // ARCANES
+    // =====================================================
 
-    const i1 = wasmExports.getLame(1);
-    const i2 = wasmExports.getLame(2);
-    const i3 = wasmExports.getLame(3);
+    const ARCANES = [
+      '0 · Le Mat',
+      'I · Le Bateleur',
+      'II · La Papesse',
+      "III · L'Impératrice",
+      "IV · L'Empereur",
+      'V · Le Pape',
+      "VI · L'Amoureux",
+      'VII · Le Chariot',
+      'VIII · La Justice',
+      "IX · L'Hermite",
+      'X · La Roue de Fortune',
+      'XI · La Force',
+      'XII · Le Pendu',
+      "XIII · L'Arcane sans nom",
+      'XIV · Tempérance',
+      'XV · Le Diable',
+      'XVI · La Maison Dieu',
+      "XVII · L'Étoile",
+      'XVIII · La Lune',
+      'XIX · Le Soleil',
+      'XX · Le Jugement',
+      'XXI · Le Monde'
+    ];
 
-    const v1 = VERS_POS_1[i1];
-    const v2 = VERS_POS_2[i2];
-    const v3 = VERS_POS_3[i3];
+    // =====================================================
+    // VERS POÉTIQUES
+    // =====================================================
 
-    document.getElementById("triade").innerHTML = `
-      <div class="lame-card">
-        <span class="lame-pos">I · Passé</span>
-        <span class="lame-nom">${ARCANES[i1]}</span>
-      </div>
-      <div class="lame-card">
-        <span class="lame-pos">II · Présent</span>
-        <span class="lame-nom">${ARCANES[i2]}</span>
-      </div>
-      <div class="lame-card">
-        <span class="lame-pos">III · Futur</span>
-        <span class="lame-nom">${ARCANES[i3]}</span>
-      </div>
-    `;
+    const VERS_POS_1 = [
+      "Le sac sur l'épaule,",
+      'Sur la table neuve,',
+      'Sous le voile sombre,',
+      'Graine en plein sillon,',
+      'Pierre sur le roc,',
+      'Entre deux piliers,',
+      'Au croisement nu,',
+      'Deux sphinx attelés,',
+      'Plateaux de métal,',
+      'Pas lents dans la nuit,',
+      'Le cercle a tourné,',
+      'Le feu maîtrisé,',
+      'Liens noués au bois,',
+      'Épis moissonnés,',
+      "Deux coupes d'argent,",
+      'Chaînes au brasier,',
+      'Tour dressée trop haut,',
+      "Cruches d'eau versées,",
+      "Reflets sur l'étang,",
+      "L'ombre derrière soi,",
+      'Appel sous la dalle,',
+      'Quatre coins du ciel,'
+    ];
 
-    document.getElementById("poeme").innerHTML = `${v1}<br>${v2}<br>${v3}`;
+    const VERS_POS_2 = [
+      'Au bord du gouffre sans nom,',
+      'La main choisit ses outils,',
+      "Le livre scellé d'argent,",
+      "L'étoile au front souverain,",
+      "L'équerre trace la loi,",
+      'Le souffle unit les esprits,',
+      'Le cœur hésite et frémit,',
+      'Les rênes fermes en main,',
+      'Le glaive tranche le doute,',
+      'La lampe sous le manteau,',
+      'La main saisit le pivot,',
+      'Douceur sur la gueule ouverte,',
+      "Le ciel regarde à l'envers,",
+      "L'acier dénude le sol,",
+      "L'eau pure passe sans bruit,",
+      'Les torches dansent la nuit,',
+      "L'éclair frappe le donjon,",
+      "À genoux sous l'astre clair,",
+      'Deux tours veillent dans le bleu,',
+      'Le grand jour chauffe la pierre,',
+      "L'éclat d'or fend le silence,",
+      'Danse au cœur de la couronne,'
+    ];
 
-    const s1 = wasmExports.getSyllabesVers(1);
-    const s2 = wasmExports.getSyllabesVers(2);
-    const s3 = wasmExports.getSyllabesVers(3);
-    const rime = wasmExports.aRimeEmbrassee() === 1;
+    const VERS_POS_3 = [
+      'Le vent libre appelle.',
+      "L'œuvre prend racine.",
+      "L'ombre se dévoile.",
+      'Le verbe fleurit.',
+      "L'édifice tient.",
+      "Le lien s'accomplit.",
+      'La voie se décide.',
+      'Le char passe en roi.',
+      'Tout reprend son poids.',
+      "Le sentier s'éclaire.",
+      'Le sort se renverse.',
+      'Le calme triomphe.',
+      "L'être lâche prise.",
+      'Un germe renaît.',
+      "La fièvre s'apaise.",
+      'Le pacte se brise.',
+      "Les murs s'ouvrent nus.",
+      'La terre reverdit.',
+      "Le songe s'éveille.",
+      'La joie rayonne.',
+      "L'âme se relève.",
+      'Le cycle est entier.'
+    ];
 
-    document.getElementById("analyse").innerHTML = `
-      <strong>Scansion métrique (Java WebAssembly) :</strong>
-      <ul>
-        <li>Vers 1 (${ARCANES[i1]}) : <strong>${s1} syllabes</strong></li>
-        <li>Vers 2 (${ARCANES[i2]}) : <strong>${s2} syllabes</strong></li>
-        <li>Vers 3 (${ARCANES[i3]}) : <strong>${s3} syllabes</strong></li>
-      </ul>
-      <div>Rime embrassée (Vers 1 & 3) : <strong>${rime ? "Oui" : "Non (vers libres)"}</strong></div>
-    `;
-  }
+    // =====================================================
+    // ÉTAT
+    // =====================================================
 
-  window.addEventListener("load", async () => {
-    try {
-      const importObject = {
-        teavm: {
-          currentTimeMillis: () => Date.now(),
-          nanoTime: () => performance.now() * 1000000,
-          putwchar: () => {},
-          logString: () => {},
-          logInt: () => {},
-          logOutOfMemory: () => console.error("Wasm OutOfMemory")
-        },
-        teavmMath: Math
+    let wasmExports = null;
+    let triadeYiKingAffichee = false;
+
+    const PARAMS = new URLSearchParams(location.search);
+
+    // =====================================================
+    // SÉCURITÉ D’AFFICHAGE
+    // =====================================================
+
+    function echapperHTML(valeur) {
+      return String(valeur ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // =====================================================
+    // LECTURE DU CONTEXTE YI KING
+    // =====================================================
+
+    function lireListeNombres(nom) {
+      const valeur = PARAMS.get(nom);
+
+      if (!valeur) {
+        return [];
+      }
+
+      return valeur
+        .split(',')
+        .map(element => parseInt(element, 10))
+        .filter(Number.isFinite);
+    }
+
+    function lireContexteYiKing() {
+      const hexagramme = parseInt(
+        PARAMS.get('hex'),
+        10
+      );
+
+      const relatif = parseInt(
+        PARAMS.get('vers'),
+        10
+      );
+
+      const arcanes = PARAMS.get('arcanes')
+        ? PARAMS
+            .get('arcanes')
+            .split('|')
+            .map(nom => nom.trim())
+            .filter(Boolean)
+        : [];
+
+      return {
+        actif:
+          hexagramme >= 1 &&
+          hexagramme <= 64,
+
+        hexagramme:
+          hexagramme >= 1 &&
+          hexagramme <= 64
+            ? hexagramme
+            : null,
+
+        relatif:
+          relatif >= 1 &&
+          relatif <= 64
+            ? relatif
+            : null,
+
+        lignes: lireListeNombres('lignes'),
+
+        mutantes: lireListeNombres('mutantes'),
+
+        trigrammeInferieur:
+          PARAMS.get('base') || '',
+
+        trigrammeSuperieur:
+          PARAMS.get('manifestation') || '',
+
+        arcanes
+      };
+    }
+
+    const CONTEXTE_YI_KING =
+      lireContexteYiKing();
+
+    // =====================================================
+    // NORMALISATION DES ARCANES
+    // =====================================================
+
+    function normaliserTexte(texte) {
+      return String(texte || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[’']/g, '')
+        .replace(/[^a-zA-Z0-9]/g, '')
+        .toLowerCase();
+    }
+
+    function nomArcaneSansNumero(arcane) {
+      return String(arcane)
+        .replace(
+          /^(0|I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX|XXI)\s*·\s*/i,
+          ''
+        )
+        .trim();
+    }
+
+    function appliquerAliasArcane(nom) {
+      const alias = {
+        ermite: 'hermite',
+        lermite: 'lhermite',
+        arcane13: 'arcanesansnom',
+        larcane13: 'larcanesansnom'
       };
 
-      const response = await fetch("classes.wasm");
-      if (!response.ok) {
-        throw new Error(`classes.wasm introuvable (HTTP ${response.status})`);
-      }
-      const bytes = await response.arrayBuffer();
-      const { instance } = await WebAssembly.instantiate(bytes, importObject);
-
-      wasmExports = instance.exports;
-      if (wasmExports.main) {
-        wasmExports.main();
-      }
-
-      const btn = document.getElementById("btn-generer");
-      btn.disabled = false;
-      btn.addEventListener("click", rafraichirTirage);
-      rafraichirTirage();
-    } catch (err) {
-      document.getElementById("poeme").textContent = "Erreur Wasm : " + err.message;
-      console.error(err);
+      return alias[nom] || nom;
     }
-  });
-</script>
+
+    function trouverIndiceArcane(nom) {
+      let recherche =
+        appliquerAliasArcane(
+          normaliserTexte(nom)
+        );
+
+      return ARCANES.findIndex(arcane => {
+        let nomNormalise =
+          normaliserTexte(
+            nomArcaneSansNumero(arcane)
+          );
+
+        nomNormalise =
+          appliquerAliasArcane(nomNormalise);
+
+        return nomNormalise === recherche;
+      });
+    }
+
+    function indicesArcanesYiKing() {
+      if (!CONTEXTE_YI_KING.actif) {
+        return null;
+      }
+
+      if (
+        CONTEXTE_YI_KING.arcanes.length !== 3
+      ) {
+        return null;
+      }
+
+      const indices =
+        CONTEXTE_YI_KING.arcanes.map(
+          trouverIndiceArcane
+        );
+
+      return indices.every(index => index >= 0)
+        ? indices
+        : null;
+    }
+
+    // =====================================================
+    // AFFICHAGE DU CONTEXTE YI KING
+    // =====================================================
+
+    function afficherContexteYiKing() {
+      if (!CONTEXTE_YI_KING.actif) {
+        return;
+      }
+
+      const zone = document.getElementById(
+        'contexte-yijing'
+      );
+
+      const boutonRetour =
+        document.getElementById(
+          'btn-retour-oracle'
+        );
+
+      const lignes =
+        CONTEXTE_YI_KING.lignes.length
+          ? CONTEXTE_YI_KING.lignes
+              .map(echapperHTML)
+              .join(' · ')
+          : 'non transmises';
+
+      const mutantes =
+        CONTEXTE_YI_KING.mutantes.length
+          ? CONTEXTE_YI_KING.mutantes
+              .map(echapperHTML)
+              .join(', ')
+          : 'aucune';
+
+      let trigrammesHTML = '';
+
+      if (
+        CONTEXTE_YI_KING
+          .trigrammeInferieur &&
+        CONTEXTE_YI_KING
+          .trigrammeSuperieur
+      ) {
+        trigrammesHTML = `
+          <div>
+            <strong>
+              Mouvement symbolique :
+            </strong>
+
+            ${echapperHTML(
+              CONTEXTE_YI_KING
+                .trigrammeInferieur
+            )}
+
+            →
+
+            ${echapperHTML(
+              CONTEXTE_YI_KING
+                .trigrammeSuperieur
+            )}
+          </div>
+        `;
+      }
+
+      let evolutionHTML = '';
+
+      if (CONTEXTE_YI_KING.relatif) {
+        evolutionHTML = `
+          <div
+            class="contexte-yijing-evolution"
+          >
+            L’hexagramme
+            ${CONTEXTE_YI_KING.hexagramme}
+            se transforme vers l’hexagramme
+            ${CONTEXTE_YI_KING.relatif}.
+          </div>
+        `;
+      } else {
+        evolutionHTML = `
+          <div
+            class="contexte-yijing-evolution"
+          >
+            L’hexagramme
+            ${CONTEXTE_YI_KING.hexagramme}
+            se présente sans ligne mutante.
+          </div>
+        `;
+      }
+
+      zone.hidden = false;
+      boutonRetour.hidden = false;
+
+      zone.innerHTML = `
+        <div class="contexte-yijing-title">
+          ☯ Résonance du tirage Yi King
+        </div>
+
+        <div>
+          <strong>
+            Hexagramme initial :
+          </strong>
+
+          ${CONTEXTE_YI_KING.hexagramme}
+        </div>
+
+        ${
+          CONTEXTE_YI_KING.relatif
+            ? `
+              <div>
+                <strong>
+                  Hexagramme relatif :
+                </strong>
+
+                ${CONTEXTE_YI_KING.relatif}
+              </div>
+            `
+            : ''
+        }
+
+        <div>
+          <strong>Lignes :</strong>
+          ${lignes}
+        </div>
+
+        <div>
+          <strong>
+            Lignes mutantes :
+          </strong>
+
+          ${mutantes}
+        </div>
+
+        ${trigrammesHTML}
+        ${evolutionHTML}
+      `;
+    }
+
+    // =====================================================
+    // CONSTRUCTION DES CARTES
+    // =====================================================
+
+    function afficherCartes(
+      indices,
+      tirageImporte
+    ) {
+      const positions = tirageImporte
+        ? [
+            {
+              titre: 'I · Individuation',
+              question:
+                'Qu’est-ce qui cherche à se constituer ?'
+            },
+            {
+              titre: 'II · Synchronicité',
+              question:
+                'Qu’est-ce que la situation me renvoie ?'
+            },
+            {
+              titre: 'III · Conduite',
+              question:
+                'Comment conduire la transformation ?'
+            }
+          ]
+        : [
+            {
+              titre: 'I · Passé',
+              question: ''
+            },
+            {
+              titre: 'II · Présent',
+              question: ''
+            },
+            {
+              titre: 'III · Futur',
+              question: ''
+            }
+          ];
+
+      const cartes = indices.map(
+        (indice, position) => ({
+          indice,
+          ...positions[position]
+        })
+      );
+
+      document.getElementById(
+        'triade'
+      ).innerHTML = cartes
+        .map(carte => `
+          <article class="lame-card">
+            <span class="lame-pos">
+              ${echapperHTML(carte.titre)}
+            </span>
+
+            <span class="lame-nom">
+              ${echapperHTML(
+                ARCANES[carte.indice]
+              )}
+            </span>
+
+            ${
+              carte.question
+                ? `
+                  <div class="tarot-question">
+                    ${echapperHTML(
+                      carte.question
+                    )}
+                  </div>
+                `
+                : ''
+            }
+          </article>
+        `)
+        .join('');
+    }
+
+    // =====================================================
+    // AFFICHAGE DU POÈME
+    // =====================================================
+
+    function afficherPoeme(i1, i2, i3) {
+      const vers1 = VERS_POS_1[i1];
+      const vers2 = VERS_POS_2[i2];
+      const vers3 = VERS_POS_3[i3];
+
+      document.getElementById(
+        'poeme'
+      ).innerHTML = `
+        ${echapperHTML(vers1)}<br>
+        ${echapperHTML(vers2)}<br>
+        ${echapperHTML(vers3)}
+      `;
+    }
+
+    // =====================================================
+    // ANALYSE WEBASSEMBLY
+    // =====================================================
+
+    function afficherAnalyseWasm(
+      i1,
+      i2,
+      i3
+    ) {
+      const s1 =
+        wasmExports.getSyllabesVers(1);
+
+      const s2 =
+        wasmExports.getSyllabesVers(2);
+
+      const s3 =
+        wasmExports.getSyllabesVers(3);
+
+      const rime =
+        wasmExports.aRimeEmbrassee() === 1;
+
+      document.getElementById(
+        'analyse'
+      ).innerHTML = `
+        <strong class="analyse-title">
+          Scansion métrique Java WebAssembly
+        </strong>
+
+        <ul>
+          <li>
+            Vers 1
+            (${echapperHTML(ARCANES[i1])}) :
+            <strong>${s1} syllabes</strong>
+          </li>
+
+          <li>
+            Vers 2
+            (${echapperHTML(ARCANES[i2])}) :
+            <strong>${s2} syllabes</strong>
+          </li>
+
+          <li>
+            Vers 3
+            (${echapperHTML(ARCANES[i3])}) :
+            <strong>${s3} syllabes</strong>
+          </li>
+        </ul>
+
+        <div>
+          Rime entre les vers 1 et 3 :
+          <strong>
+            ${
+              rime
+                ? 'Oui'
+                : 'Non, vers libres'
+            }
+          </strong>
+        </div>
+      `;
+    }
+
+    // =====================================================
+    // ANALYSE DU TIRAGE IMPORTÉ
+    // =====================================================
+
+    function afficherAnalyseImportee(
+      i1,
+      i2,
+      i3
+    ) {
+      document.getElementById(
+        'analyse'
+      ).innerHTML = `
+        <strong class="analyse-title">
+          Lecture symbolique de la triade
+        </strong>
+
+        <ul>
+          <li>
+            <strong>Individuation :</strong>
+
+            ${echapperHTML(ARCANES[i1])}
+            représente ce qui cherche à
+            prendre forme.
+          </li>
+
+          <li>
+            <strong>Synchronicité :</strong>
+
+            ${echapperHTML(ARCANES[i2])}
+            représente le reflet proposé
+            par la situation.
+          </li>
+
+          <li>
+            <strong>Conduite :</strong>
+
+            ${echapperHTML(ARCANES[i3])}
+            représente la manière
+            d’accompagner la transformation.
+          </li>
+        </ul>
+
+        <div class="atelier-note">
+          Le poème constitue une résonance
+          symbolique du tirage. Il ne remplace
+          ni le jugement, ni les lignes
+          mutantes, ni l’hexagramme relatif
+          du Yi King.
+        </div>
+      `;
+    }
+
+    // =====================================================
+    // TIRAGE ET RAFRAÎCHISSEMENT
+    // =====================================================
+
+    function rafraichirTirage(
+      forcerAleatoire = false
+    ) {
+      if (!wasmExports) {
+        return;
+      }
+
+      const indicesYiKing =
+        indicesArcanesYiKing();
+
+      let indices;
+      let tirageImporte = false;
+
+      if (
+        indicesYiKing &&
+        !forcerAleatoire
+      ) {
+        indices = indicesYiKing;
+        tirageImporte = true;
+      } else {
+        wasmExports.tirerTriade();
+
+        indices = [
+          wasmExports.getLame(1),
+          wasmExports.getLame(2),
+          wasmExports.getLame(3)
+        ];
+      }
+
+      const [i1, i2, i3] = indices;
+
+      afficherCartes(
+        indices,
+        tirageImporte
+      );
+
+      afficherPoeme(i1, i2, i3);
+
+      if (tirageImporte) {
+        afficherAnalyseImportee(
+          i1,
+          i2,
+          i3
+        );
+      } else {
+        afficherAnalyseWasm(
+          i1,
+          i2,
+          i3
+        );
+      }
+
+      triadeYiKingAffichee =
+        tirageImporte;
+
+      const bouton =
+        document.getElementById(
+          'btn-generer'
+        );
+
+      bouton.textContent =
+        tirageImporte
+          ? 'Tirer une triade poétique indépendante'
+          : 'Tirer une nouvelle triade';
+    }
+
+    // =====================================================
+    // CHARGEMENT DU MODULE WEBASSEMBLY
+    // =====================================================
+
+    window.addEventListener(
+      'load',
+      async () => {
+        const poeme =
+          document.getElementById(
+            'poeme'
+          );
+
+        const bouton =
+          document.getElementById(
+            'btn-generer'
+          );
+
+        try {
+          const importObject = {
+            teavm: {
+              currentTimeMillis:
+                () => Date.now(),
+
+              nanoTime:
+                () =>
+                  performance.now() *
+                  1000000,
+
+              putwchar: () => {},
+
+              logString: () => {},
+
+              logInt: () => {},
+
+              logOutOfMemory: () => {
+                console.error(
+                  'Wasm OutOfMemory'
+                );
+              }
+            },
+
+            teavmMath: Math
+          };
+
+          const response =
+            await fetch('classes.wasm');
+
+          if (!response.ok) {
+            throw new Error(
+              'classes.wasm introuvable ' +
+              `(HTTP ${response.status})`
+            );
+          }
+
+          const bytes =
+            await response.arrayBuffer();
+
+          const resultat =
+            await WebAssembly.instantiate(
+              bytes,
+              importObject
+            );
+
+          wasmExports =
+            resultat.instance.exports;
+
+          if (
+            typeof wasmExports.main ===
+            'function'
+          ) {
+            wasmExports.main();
+          }
+
+          if (
+            typeof wasmExports
+              .tirerTriade !== 'function' ||
+            typeof wasmExports
+              .getLame !== 'function'
+          ) {
+            throw new Error(
+              'Les fonctions Wasm attendues ' +
+              'ne sont pas disponibles.'
+            );
+          }
+
+          bouton.disabled = false;
+
+          bouton.addEventListener(
+            'click',
+            () => {
+              /*
+               * Si la triade du Yi King est
+               * affichée, le premier clic
+               * bascule vers une triade
+               * indépendante.
+               *
+               * Les clics suivants produisent
+               * de nouvelles triades aléatoires.
+               */
+              rafraichirTirage(true);
+            }
+          );
+
+          afficherContexteYiKing();
+
+          /*
+           * false :
+           * utilisation prioritaire des arcanes
+           * reçus depuis le Yi King.
+           */
+          rafraichirTirage(false);
+        } catch (erreur) {
+          console.error(erreur);
+
+          poeme.classList.add('erreur');
+
+          poeme.textContent =
+            'Erreur WebAssembly : ' +
+            erreur.message;
+
+          document.getElementById(
+            'analyse'
+          ).innerHTML = `
+            <div class="atelier-note">
+              Vérifie que le fichier
+              <strong>classes.wasm</strong>
+              se trouve dans le même dossier
+              que cette page HTML.
+            </div>
+          `;
+        }
+      }
+    );
+  </script>
 
 </body>
 </html>
