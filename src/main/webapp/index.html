@@ -115,12 +115,15 @@
     .triade {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.75rem;
+      gap: 0.85rem;
       margin: 1.25rem 0;
       font-family: system-ui, sans-serif;
     }
 
     .lame-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       min-width: 0;
       padding: 0.9rem 0.65rem;
       background: #faf8f5;
@@ -132,13 +135,32 @@
     .lame-pos {
       display: block;
       min-height: 2em;
-      margin-bottom: 0.45rem;
+      margin-bottom: 0.5rem;
       color: #7a746e;
       font-size: 0.7rem;
       font-weight: 600;
       line-height: 1.4;
       letter-spacing: 0.7px;
       text-transform: uppercase;
+    }
+
+    .lame-img-wrap {
+      width: 100%;
+      max-width: 145px;
+      aspect-ratio: 3 / 5;
+      margin: 0 auto 0.65rem;
+      background: #f0ebe3;
+      border: 1px solid #d8c7b8;
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(44, 42, 41, 0.08);
+    }
+
+    .lame-img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .lame-nom {
@@ -284,6 +306,87 @@
       text-align: center;
     }
 
+    /* ========== GALERIE DES 22 ARCANES (0.png -> 21.png) ========== */
+
+    .galerie-section {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e6e0d8;
+      font-family: system-ui, sans-serif;
+    }
+
+    .galerie-section summary {
+      color: #8c4a32;
+      font-family: Georgia, serif;
+      font-size: 0.98rem;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+    }
+
+    .galerie-section summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .galerie-section summary::before {
+      content: '▸ ';
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+
+    .galerie-section[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    .galerie-grille {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .galerie-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.5rem;
+      background: #faf8f5;
+      border: 1px solid #e6e0d8;
+      border-radius: 6px;
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .galerie-item.active {
+      background: rgba(140, 74, 50, 0.06);
+      border-color: #8c4a32;
+      box-shadow: 0 2px 8px rgba(140, 74, 50, 0.14);
+    }
+
+    .galerie-item img {
+      width: 100%;
+      aspect-ratio: 3 / 5;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #d8c7b8;
+      margin-bottom: 0.45rem;
+    }
+
+    .galerie-item-titre {
+      color: #2c2a29;
+      font-family: Georgia, serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .galerie-item-fichier {
+      margin-top: 0.2rem;
+      color: #7a746e;
+      font-size: 0.68rem;
+    }
+
     .erreur {
       color: #8b1e1e;
       font-style: normal;
@@ -304,6 +407,10 @@
 
       .lame-pos {
         min-height: auto;
+      }
+
+      .lame-img-wrap {
+        max-width: 170px;
       }
 
       .poeme-box {
@@ -375,10 +482,25 @@
       id="analyse"
       aria-live="polite"
     ></section>
+
+    <details class="galerie-section" id="galerie-section">
+      <summary>Voir les 22 lames du Tarot dans l’ordre (0.png à 21.png)</summary>
+      <div class="galerie-grille" id="galerie-grille"></div>
+    </details>
   </main>
 
   <script>
     'use strict';
+
+    // =====================================================
+    // CHEMIN DES IMAGES (0.png à 21.png)
+    // =====================================================
+
+    const CHEMIN_IMAGES = '/atelier-poetique/image';
+
+    function urlImageArcane(indice) {
+      return `${CHEMIN_IMAGES}/${indice}.png`;
+    }
 
     // =====================================================
     // ARCANES
@@ -788,7 +910,7 @@
     }
 
     // =====================================================
-    // CONSTRUCTION DES CARTES
+    // CONSTRUCTION DES CARTES (TRIADE & GALERIE)
     // =====================================================
 
     function afficherCartes(
@@ -838,31 +960,73 @@
       document.getElementById(
         'triade'
       ).innerHTML = cartes
-        .map(carte => `
-          <article class="lame-card">
-            <span class="lame-pos">
-              ${echapperHTML(carte.titre)}
-            </span>
+        .map(carte => {
+          const nomArcane = ARCANES[carte.indice];
+          const srcImage = urlImageArcane(carte.indice);
 
-            <span class="lame-nom">
-              ${echapperHTML(
-                ARCANES[carte.indice]
-              )}
-            </span>
+          return `
+            <article class="lame-card">
+              <span class="lame-pos">
+                ${echapperHTML(carte.titre)}
+              </span>
 
-            ${
-              carte.question
-                ? `
-                  <div class="tarot-question">
-                    ${echapperHTML(
-                      carte.question
-                    )}
-                  </div>
-                `
-                : ''
-            }
-          </article>
-        `)
+              <div class="lame-img-wrap">
+                <img
+                  class="lame-img"
+                  src="${echapperHTML(srcImage)}"
+                  alt="${echapperHTML(nomArcane)}"
+                  loading="eager"
+                >
+              </div>
+
+              <span class="lame-nom">
+                ${echapperHTML(nomArcane)}
+              </span>
+
+              ${
+                carte.question
+                  ? `
+                    <div class="tarot-question">
+                      ${echapperHTML(
+                        carte.question
+                      )}
+                    </div>
+                  `
+                  : ''
+              }
+            </article>
+          `;
+        })
+        .join('');
+
+      afficherGalerieComplete(indices);
+    }
+
+    function afficherGalerieComplete(indicesActifs = []) {
+      const grille = document.getElementById('galerie-grille');
+      if (!grille) return;
+
+      grille.innerHTML = ARCANES
+        .map((nomArcane, indice) => {
+          const estActif = indicesActifs.includes(indice);
+          const srcImage = urlImageArcane(indice);
+
+          return `
+            <div class="galerie-item ${estActif ? 'active' : ''}">
+              <img
+                src="${echapperHTML(srcImage)}"
+                alt="${echapperHTML(nomArcane)}"
+                loading="lazy"
+              >
+              <span class="galerie-item-titre">
+                ${echapperHTML(nomArcane)}
+              </span>
+              <span class="galerie-item-fichier">
+                ${indice}.png
+              </span>
+            </div>
+          `;
+        })
         .join('');
     }
 
@@ -1074,6 +1238,8 @@
     window.addEventListener(
       'load',
       async () => {
+        afficherGalerieComplete();
+
         const poeme =
           document.getElementById(
             'poeme'
@@ -1157,26 +1323,11 @@
           bouton.addEventListener(
             'click',
             () => {
-              /*
-               * Si la triade du Yi King est
-               * affichée, le premier clic
-               * bascule vers une triade
-               * indépendante.
-               *
-               * Les clics suivants produisent
-               * de nouvelles triades aléatoires.
-               */
               rafraichirTirage(true);
             }
           );
 
           afficherContexteYiKing();
-
-          /*
-           * false :
-           * utilisation prioritaire des arcanes
-           * reçus depuis le Yi King.
-           */
           rafraichirTirage(false);
         } catch (erreur) {
           console.error(erreur);
