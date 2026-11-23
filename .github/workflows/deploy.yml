@@ -26,8 +26,7 @@ jobs:
       - name: Compiler Java vers WebAssembly
         run: |
           mvn clean package
-          cp -r src/main/webapp/image target/generated/wasm/teavm/
-
+          cp -r src/main/webapp/image target/wasm/
 
       - name: Configurer GitHub Pages
         uses: actions/configure-pages@v5
