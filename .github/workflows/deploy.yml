@@ -12,6 +12,9 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Récupérer le code
         uses: actions/checkout@v4
@@ -32,9 +35,10 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Préparer l'artefact Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: 'target/wasm'
 
       - name: Déployer sur GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
